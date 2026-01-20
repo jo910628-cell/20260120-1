@@ -1,0 +1,39 @@
+// 1. 웹앱 접속 시 실행되는 함수
+function doGet() {
+  return HtmlService.createTemplateFromFile('Index')
+    .evaluate()
+    .setTitle('체크메이트: 스마트 수합 시스템')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// 2. 시트에서 학생 명단 가져오기
+function getMemberList() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('Members');
+  const data = sheet.getDataRange().getValues();
+  
+  // 첫 줄(헤더) 제외하고 객체 형태로 변환
+  const members = data.slice(1).map(row => ({
+    id: row[0],
+    name: row[1]
+  }));
+  return members;
+}
+
+// 3. 체크 결과 저장하기
+function saveCheckData(taskName, selectedMembers) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName('Log');
+  const now = new Date();
+  
+  selectedMembers.forEach(member => {
+    logSheet.appendRow([
+      now, 
+      taskName, 
+      member.id, 
+      member.name, 
+      "제출완료"
+    ]);
+  });
+  return "저장되었습니다!";
+}
